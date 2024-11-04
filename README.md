@@ -1,21 +1,19 @@
 # WDQRCodeScanner
 
-WDQRCodeScanner 是一个功能强大的 iOS 二维码扫描组件，基于 AVFoundation 框架开发，提供了简单易用的 API 接口。
+WDQRCodeScanner 是一个二维码扫描组件，基于 AVFoundation 框架开发，提供了简单易用的 API 接口, 将扫描功能和界面UI完全分开，可以直接使用自带UI, 也可自定义UI。
 
 ## 功能特点
 
-- 🎯 实时二维码扫描
+- 🎯 实时二维码扫描, 多二维码扫描
 - 💡 闪光灯控制
 - 📸 相机权限管理
 - 🔄 状态管理与回调
 - 🎨 自定义扫描界面
-- 📱 支持 SwiftUI 和 UIKit
 
 ## 系统要求
 
 - iOS 13.0+
 - Swift 5.0+
-- Xcode 13.0+
 
 ## 安装方法
 
