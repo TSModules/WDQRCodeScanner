@@ -205,41 +205,6 @@ open class WDQRScannerViewController: UIViewController {
         present(alert, animated: true)
     }
     
-    public func getImageFromSampleBuffer(sampleBuffer: CMSampleBuffer) -> UIImage? {
-        let scale = UIScreen.main.scale
-        guard let pixelBuffer = CMSampleBufferGetImageBuffer(sampleBuffer) else { return nil }
-        CVPixelBufferLockBaseAddress(pixelBuffer, .readOnly)
-        let baseAddress = CVPixelBufferGetBaseAddress(pixelBuffer)
-        let width = CVPixelBufferGetWidth(pixelBuffer)
-        let height = CVPixelBufferGetHeight(pixelBuffer)
-        let bytesPerRow = CVPixelBufferGetBytesPerRow(pixelBuffer)
-        let colorSpace = CGColorSpaceCreateDeviceRGB()
-        let bitmapInfo = CGBitmapInfo(rawValue: CGImageAlphaInfo.premultipliedFirst.rawValue | CGBitmapInfo.byteOrder32Little.rawValue)
-        guard let context = CGContext(data: baseAddress, width: width, height: height, bitsPerComponent: 8, bytesPerRow: bytesPerRow, space: colorSpace, bitmapInfo: bitmapInfo.rawValue) else { return nil }
-        guard let cgImage = context.makeImage() else { return nil }
-
-        let sampleBuffer = UIImage(cgImage: cgImage, scale: scale, orientation: .up)
-        CVPixelBufferUnlockBaseAddress(pixelBuffer, .readOnly)
-
-        return readQRCode(sampleBuffer)
-    }
-
-    public func readQRCode(_ image: UIImage) -> UIImage? {
-        guard let ciImage = CIImage(image: image) else { return nil }
-        let detector = CIDetector(ofType: CIDetectorTypeQRCode, context: nil, options: [CIDetectorAccuracy: CIDetectorAccuracyHigh])
-        guard let features = detector?.features(in: ciImage) else { return nil }
-        guard let feature = features.first as? CIQRCodeFeature else { return nil }
-
-        let transform = CGAffineTransform(scaleX: 1, y: -1).translatedBy(x: 0, y: -ciImage.extent.size.height)
-        let path = UIBezierPath()
-        path.move(to: feature.topLeft.applying(transform))
-        path.addLine(to: feature.topRight.applying(transform))
-        path.addLine(to: feature.bottomRight.applying(transform))
-        path.addLine(to: feature.bottomLeft.applying(transform))
-        path.close()
-        return image.crop(path)
-    }
-    
     func handleScanResult(_ results: [WDQRScannerResult]) {
         guard !results.isEmpty else { return }
         
@@ -442,23 +407,5 @@ extension UILabel {
                 paddingView.rightAnchor.constraint(equalTo: self.rightAnchor, constant: newValue.right),
             ])
         }
-    }
-}
-
-private extension UIImage {
-    func crop(_ path: UIBezierPath) -> UIImage? {
-        let rect = CGRect(origin: CGPoint(), size: CGSize(width: size.width * scale, height: size.height * scale))
-        UIGraphicsBeginImageContextWithOptions(rect.size, false, scale)
-
-        UIColor.clear.setFill()
-        UIRectFill(rect)
-        path.addClip()
-        draw(in: rect)
-
-        let image = UIGraphicsGetImageFromCurrentImageContext()
-        UIGraphicsEndImageContext()
-
-        guard let croppedImage = image?.cgImage?.cropping(to: CGRect(x: path.bounds.origin.x * scale, y: path.bounds.origin.y * scale, width: path.bounds.size.width * scale, height: path.bounds.size.height * scale)) else { return nil }
-        return UIImage(cgImage: croppedImage, scale: scale, orientation: imageOrientation)
     }
 }
