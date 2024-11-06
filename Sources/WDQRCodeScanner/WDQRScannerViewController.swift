@@ -218,7 +218,7 @@ open class WDQRScannerViewController: UIViewController {
                 print(object.corners)
                 let btn = _InnerResultButton()
                 let config = UIImage.SymbolConfiguration(pointSize: 40)
-                btn.setImage(UIImage(systemName: "arrow.right.circle", withConfiguration: config)?.withTintColor(.green), for: .normal)
+                btn.setImage(UIImage(systemName: "arrow.right.circle", withConfiguration: config), for: .normal)
                 btn.tag = 100 + index
                 btn.tintColor = .green
                 btn.addTarget(self, action: #selector(scanResultButtonTapped(_:)), for: .touchUpInside)
